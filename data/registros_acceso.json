@@ -1,0 +1,44 @@
+[
+  {
+    "id_registro": 1,
+    "id_qr": 1,
+    "fecha_hora": "2026-04-24T06:15:00.000Z",
+    "tipo_movimiento": "ENTRADA",
+    "resultado": "EXITOSO"
+  },
+  {
+    "id_registro": 2,
+    "id_qr": 2,
+    "fecha_hora": "2026-04-24T06:20:00.000Z",
+    "tipo_movimiento": "ENTRADA",
+    "resultado": "EXITOSO"
+  },
+  {
+    "id_registro": 3,
+    "id_qr": 3,
+    "fecha_hora": "2026-04-24T06:22:00.000Z",
+    "tipo_movimiento": "ENTRADA",
+    "resultado": "FALLIDO"
+  },
+  {
+    "id_registro": 4,
+    "id_qr": 4,
+    "fecha_hora": "2026-04-24T06:28:00.000Z",
+    "tipo_movimiento": "ENTRADA",
+    "resultado": "EXITOSO"
+  },
+  {
+    "id_registro": 5,
+    "id_qr": 1,
+    "fecha_hora": "2026-04-24T14:10:00.000Z",
+    "tipo_movimiento": "SALIDA",
+    "resultado": "EXITOSO"
+  },
+  {
+    "id_registro": 6,
+    "id_qr": 2,
+    "fecha_hora": "2026-04-24T14:28:00.000Z",
+    "tipo_movimiento": "SALIDA",
+    "resultado": "EXITOSO"
+  }
+]

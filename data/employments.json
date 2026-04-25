@@ -1,0 +1,47 @@
+[
+  {
+    "id": "EMP-001",
+    "name": "María González Pérez",
+    "document": "1234567890",
+    "department": "Administración",
+    "role": "Directora",
+    "status": "Activo",
+    "avatar": "https://i.pravatar.cc/150?u=a042581f4e29026704d"
+  },
+  {
+    "id": "EMP-002",
+    "name": "Carlos Ramírez López",
+    "document": "0987654321",
+    "department": "Mantenimiento",
+    "role": "Técnico",
+    "status": "Activo",
+    "avatar": "https://i.pravatar.cc/150?u=a042581f4e29026704e"
+  },
+  {
+    "id": "EMP-003",
+    "name": "Ana López Martínez",
+    "document": "1122334455",
+    "department": "Biblioteca",
+    "role": "Bibliotecaria",
+    "status": "Activo",
+    "avatar": "https://i.pravatar.cc/150?u=a042581f4e29026704f"
+  },
+  {
+    "id": "EMP-004",
+    "name": "Juan Pérez García",
+    "document": "5544332211",
+    "department": "Laboratorios",
+    "role": "Asistente",
+    "status": "Inactivo",
+    "avatar": "https://i.pravatar.cc/150?u=a042581f4e29026704g"
+  },
+  {
+    "id": "EMP-005",
+    "name": "Laura Sánchez Díaz",
+    "document": "6677889900",
+    "department": "Docencia",
+    "role": "Profesora",
+    "status": "Activo",
+    "avatar": "https://i.pravatar.cc/150?u=a042581f4e29026704h"
+  }
+]

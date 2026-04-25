@@ -1,0 +1,20 @@
+[
+  {
+    "id_area": 1,
+    "nombre_area": "Tecnologia",
+    "descripcion": "Area de desarrollo y sistemas",
+    "activa": true
+  },
+  {
+    "id_area": 2,
+    "nombre_area": "Recursos Humanos",
+    "descripcion": "Gestion del talento humano",
+    "activa": true
+  },
+  {
+    "id_area": 3,
+    "nombre_area": "Finanzas",
+    "descripcion": "Area contable y financiera",
+    "activa": true
+  }
+]

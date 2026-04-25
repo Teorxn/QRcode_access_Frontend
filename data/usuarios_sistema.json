@@ -1,0 +1,29 @@
+[
+  {
+    "id_usuario": 1,
+    "username": "admin01",
+    "password_hash": "$2b$10$hashadmin001xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "rol": "admin",
+    "nombre_completo": "Juan Perez",
+    "activo": true,
+    "ultimo_acceso": "2026-04-24T08:15:00.000Z"
+  },
+  {
+    "id_usuario": 2,
+    "username": "operador01",
+    "password_hash": "$2b$10$hashoperador01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "rol": "operador",
+    "nombre_completo": "Laura Gomez",
+    "activo": true,
+    "ultimo_acceso": "2026-04-24T09:02:00.000Z"
+  },
+  {
+    "id_usuario": 3,
+    "username": "visor01",
+    "password_hash": "$2b$10$hashvisor01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "rol": "visor",
+    "nombre_completo": "Andres Rios",
+    "activo": true,
+    "ultimo_acceso": null
+  }
+]

@@ -1,0 +1,72 @@
+[
+  {
+    "id_empleado": 1,
+    "num_documento": "1234567890",
+    "tipo_documento": "CC",
+    "nombres": "Carlos",
+    "apellidos": "Ramirez",
+    "email": "carlos@empresa.com",
+    "cargo": "Desarrollador",
+    "id_area": 1,
+    "id_usuario": 2,
+    "foto_url": "https://i.pravatar.cc/150?u=empleado-1",
+    "activo": true,
+    "fecha_registro": "2026-04-10T08:00:00.000Z"
+  },
+  {
+    "id_empleado": 2,
+    "num_documento": "9876543210",
+    "tipo_documento": "CC",
+    "nombres": "Maria",
+    "apellidos": "Lopez",
+    "email": "maria@empresa.com",
+    "cargo": "Analista",
+    "id_area": 1,
+    "id_usuario": null,
+    "foto_url": "https://i.pravatar.cc/150?u=empleado-2",
+    "activo": true,
+    "fecha_registro": "2026-04-11T08:30:00.000Z"
+  },
+  {
+    "id_empleado": 3,
+    "num_documento": "1122334455",
+    "tipo_documento": "CC",
+    "nombres": "Pedro",
+    "apellidos": "Suarez",
+    "email": "pedro@empresa.com",
+    "cargo": "Contador",
+    "id_area": 3,
+    "id_usuario": null,
+    "foto_url": "https://i.pravatar.cc/150?u=empleado-3",
+    "activo": true,
+    "fecha_registro": "2026-04-12T09:15:00.000Z"
+  },
+  {
+    "id_empleado": 4,
+    "num_documento": "5544332211",
+    "tipo_documento": "CE",
+    "nombres": "Lucia",
+    "apellidos": "Torres",
+    "email": "lucia@empresa.com",
+    "cargo": "Coordinadora",
+    "id_area": 2,
+    "id_usuario": null,
+    "foto_url": "https://i.pravatar.cc/150?u=empleado-4",
+    "activo": true,
+    "fecha_registro": "2026-04-13T10:20:00.000Z"
+  },
+  {
+    "id_empleado": 5,
+    "num_documento": "6655443322",
+    "tipo_documento": "PASAPORTE",
+    "nombres": "Julia",
+    "apellidos": "Mora",
+    "email": "julia@empresa.com",
+    "cargo": "Consultora",
+    "id_area": 2,
+    "id_usuario": null,
+    "foto_url": "https://i.pravatar.cc/150?u=empleado-5",
+    "activo": false,
+    "fecha_registro": "2026-04-14T11:45:00.000Z"
+  }
+]
