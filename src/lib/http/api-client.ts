@@ -1,4 +1,5 @@
 import { ApiError } from "@/lib/http/api-error";
+import { getAuthToken } from "@/lib/http/auth-token";
 
 type QueryValue = string | number | boolean | null | undefined;
 type QueryParams = Record<string, QueryValue>;
@@ -52,6 +53,11 @@ async function request<T>(path: string, config: RequestConfig = {}): Promise<T> 
   const requestHeaders = new Headers(headers);
   if (body !== undefined && !isFormData && !requestHeaders.has("Content-Type")) {
     requestHeaders.set("Content-Type", "application/json");
+  }
+
+  const token = getAuthToken();
+  if (token && !requestHeaders.has("Authorization")) {
+    requestHeaders.set("Authorization", `Bearer ${token}`);
   }
 
   const response = await fetch(createUrl(path, query), {

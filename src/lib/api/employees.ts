@@ -26,7 +26,7 @@ export const employeesApi = {
     apiClient.post<Employee, CreateEmployeeInput>(endpoints.employees, payload),
 
   update: (id: string, payload: UpdateEmployeeInput) =>
-    apiClient.patch<Employee, UpdateEmployeeInput>(`${endpoints.employees}/${id}`, payload),
+    apiClient.put<Employee, UpdateEmployeeInput>(`${endpoints.employees}/${id}`, payload),
 
   remove: (id: string) => apiClient.delete<void>(`${endpoints.employees}/${id}`),
 };

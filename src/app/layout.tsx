@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Sidebar from "./components/Sidebar";
+import { AuthProvider } from "@/app/contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Control Acceso Dashboard",
-  description: "Dashboard para control de acceso",
+  description: "Dashboard para control de acceso QR — I.U. Pascual Bravo",
 };
 
 export default function RootLayout({
@@ -25,16 +25,11 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <body>
-        <div className="flex h-screen w-full font-sans overflow-hidden">
-          <Sidebar />
-          <main className="flex-grow bg-[#f4f7fe] p-8 overflow-y-auto flex flex-col gap-6">
-            {children}
-          </main>
-        </div>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

@@ -7,7 +7,7 @@ import {
   validateAccess,
 } from "@/lib/repositories";
 import type { ScanValidationResult } from "@/types/scan";
-import QrScanner from "../components/QrScanner";
+import QrScanner from "@/app/components/QrScanner";
 
 export default function Scan() {
   const [qrInput, setQrInput] = useState("");

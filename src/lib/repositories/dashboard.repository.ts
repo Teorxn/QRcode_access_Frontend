@@ -1,5 +1,5 @@
+import { scanApi } from "@/lib/api";
 import { listAccessHistory } from "@/lib/repositories/access.repository";
-import { mockDb } from "@/lib/mock/database";
 import type { DashboardStats } from "@/types/scan";
 
 export interface DashboardTrendPoint {
@@ -30,21 +30,11 @@ function hourLabel(dateIso: string): string {
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  const recordsToday = mockDb.getAccessRecords().filter((row) => isToday(row.fechaHora));
-
-  return {
-    totalRegistrosHoy: recordsToday.length,
-    entradasHoy: recordsToday.filter((row) => row.tipoMovimiento === "ENTRADA").length,
-    salidasHoy: recordsToday.filter((row) => row.tipoMovimiento === "SALIDA").length,
-    fallidosHoy: recordsToday.filter((row) => row.resultado === "FALLIDO").length,
-    empleadosActivos: mockDb.getEmployees().filter((row) => row.activo).length,
-    tiempoPromedioValidacionMs: 8300,
-  };
+  return scanApi.getDashboardStats();
 }
 
 export async function getDashboardTrend(): Promise<DashboardTrendPoint[]> {
-  const recordsToday = mockDb
-    .getAccessRecords()
+  const recordsToday = (await listAccessHistory())
     .filter((row) => isToday(row.fechaHora))
     .sort((a, b) => new Date(a.fechaHora).getTime() - new Date(b.fechaHora).getTime());
 

@@ -1,4 +1,4 @@
-import { mockDb } from "@/lib/mock/database";
+import { areasApi, employeesApi } from "@/lib/api";
 import type { DocumentType, Employee } from "@/types/employee";
 
 export interface EmployeeRepositoryFilters {
@@ -17,19 +17,20 @@ export interface EmployeeListItem {
 }
 
 export async function listEmployees(filters?: EmployeeRepositoryFilters): Promise<EmployeeListItem[]> {
-  const areas = mockDb.getAreas();
-  const qrCodes = mockDb.getQrCodes();
+  const [areas, employees] = await Promise.all([
+    areasApi.list(),
+    employeesApi.list(filters),
+  ]);
 
-  let items: EmployeeListItem[] = mockDb.getEmployees().map((employee) => {
+  let items: EmployeeListItem[] = employees.map((employee) => {
     const area = areas.find((row) => row.idArea === employee.idArea);
-    const qr = qrCodes.find((row) => row.idEmpleado === employee.idEmpleado);
 
     return {
       employee,
       fullName: `${employee.nombres} ${employee.apellidos}`,
       areaName: area?.nombreArea ?? "Sin area",
       estadoLabel: employee.activo ? "Activo" : "Inactivo",
-      qrActivo: qr?.activo ?? false,
+      qrActivo: false,
     };
   });
 
