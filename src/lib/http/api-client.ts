@@ -96,4 +96,29 @@ export const apiClient = {
     request<T>(path, { ...config, method: "PATCH", body }),
   delete: <T>(path: string, config?: Omit<RequestConfig, "body">) =>
     request<T>(path, { ...config, method: "DELETE" }),
+  download: async (path: string, config: Omit<RequestConfig, "body"> = {}): Promise<Blob> => {
+    const { query, headers, ...rest } = config;
+
+    const requestHeaders = new Headers(headers);
+    const token = getAuthToken();
+    if (token && !requestHeaders.has("Authorization")) {
+      requestHeaders.set("Authorization", `Bearer ${token}`);
+    }
+
+    const response = await fetch(createUrl(path, query), {
+      ...rest,
+      headers: requestHeaders,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new ApiError(
+        `Download failed with status ${response.status}`,
+        response.status,
+        text,
+      );
+    }
+
+    return response.blob();
+  },
 };

@@ -271,10 +271,9 @@ export default function Scan() {
                   <div className="text-xs text-[#475569] mt-1">
                     {lastResult.mensaje}
                   </div>
-                  {lastResult.empleado && (
+                  {lastResult.empleadoNombre && (
                     <div className="text-xs text-[#475569] mt-1">
-                      Empleado: {lastResult.empleado.nombres}{" "}
-                      {lastResult.empleado.apellidos}
+                      Empleado: {lastResult.empleadoNombre}
                     </div>
                   )}
                 </div>

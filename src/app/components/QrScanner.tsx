@@ -56,10 +56,12 @@ export default function QrScanner({
 
     if (paused) {
       if (isRunning) {
-        scanner
-          .stop()
-          .then(() => setIsRunning(false))
-          .catch(() => {});
+        try {
+          scanner.stop();
+          setIsRunning(false);
+        } catch {
+          // scanner already stopped or not running
+        }
       }
       return;
     }
@@ -94,16 +96,13 @@ export default function QrScanner({
     // Cleanup on unmount
     return () => {
       if (scannerRef.current) {
-        scannerRef.current
-          .stop()
-          .then(() => {
-            scannerRef.current?.clear();
-            scannerRef.current = null;
-            setIsRunning(false);
-          })
-          .catch(() => {
-            scannerRef.current = null;
-          });
+        try {
+          scanner.stop();
+        } catch {
+          // scanner already stopped or not running
+        }
+        scannerRef.current = null;
+        setIsRunning(false);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -123,13 +122,13 @@ export default function QrScanner({
               onChange={(e) => {
                 // Stop current before switching
                 if (scannerRef.current && isRunning) {
-                  scannerRef.current
-                    .stop()
-                    .then(() => {
-                      setIsRunning(false);
-                      setSelectedCamera(e.target.value);
-                    })
-                    .catch(() => {});
+                  try {
+                    scannerRef.current.stop();
+                    setIsRunning(false);
+                  } catch {
+                    // scanner not running
+                  }
+                  setSelectedCamera(e.target.value);
                 } else {
                   setSelectedCamera(e.target.value);
                 }
@@ -181,7 +180,7 @@ export default function QrScanner({
         {/* html5-qrcode renders the video here */}
         <div
           id="qr-scanner-region"
-          className="w-full h-full [&>video]:object-cover [&>video]:w-full [&>video]:h-full"
+          className="w-full h-full [&>video]:object-cover [&>video]:w-full [&>video]:h-full [&>video]:scale-x-[-1]"
         ></div>
 
         {/* Error or loading overlay */}

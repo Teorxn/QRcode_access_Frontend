@@ -1,5 +1,4 @@
-import type { Employee } from "@/types/employee";
-import type { AccessMovement, AccessRecord, AccessResult } from "@/types/history";
+import type { AccessMovement, AccessResult } from "@/types/history";
 
 export interface ScanValidationInput {
   codigoHash: string;
@@ -10,8 +9,10 @@ export interface ScanValidationResult {
   permitido: boolean;
   resultado: AccessResult;
   mensaje: string;
-  empleado?: Employee;
-  registro?: AccessRecord;
+  empleadoNombre?: string;
+  empleadoDocumento?: string;
+  areaNombre?: string;
+  fechaHora: string;
 }
 
 export interface DashboardStats {
