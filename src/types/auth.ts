@@ -7,6 +7,7 @@ export interface LoginInput {
 
 export interface LoginResponse {
   token: string;
+  expiraEn: string;
   usuario: {
     idUsuario: number;
     username: string;

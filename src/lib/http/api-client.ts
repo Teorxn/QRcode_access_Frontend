@@ -1,5 +1,5 @@
 import { ApiError } from "@/lib/http/api-error";
-import { getAuthToken } from "@/lib/http/auth-token";
+import { clearAuthData, getAuthToken } from "@/lib/http/auth-token";
 
 type QueryValue = string | number | boolean | null | undefined;
 type QueryParams = Record<string, QueryValue>;
@@ -70,6 +70,13 @@ async function request<T>(path: string, config: RequestConfig = {}): Promise<T> 
           ? (body as BodyInit)
           : JSON.stringify(body),
   });
+
+  if (response.status === 401 && !path.includes("/auth/")) {
+    clearAuthData();
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("auth:expired"));
+    }
+  }
 
   const data = await parseResponseBody(response);
 
