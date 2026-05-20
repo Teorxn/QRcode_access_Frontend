@@ -3,7 +3,14 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { authApi } from "@/lib/api";
-import { getAuthToken, clearAuthToken } from "@/lib/http/auth-token";
+import {
+  clearAuthData,
+  getAuthExpiry,
+  getAuthToken,
+  getSavedUser,
+  saveUser,
+  setAuthExpiry,
+} from "@/lib/http/auth-token";
 import type { AuthUser } from "@/types/auth";
 
 interface AuthContextValue {
@@ -16,46 +23,39 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const AUTH_USER_KEY = "qr-access-user";
-
-function getSavedUser(): AuthUser | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(AUTH_USER_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as AuthUser;
-  } catch {
-    return null;
-  }
-}
-
-function saveUser(user: AuthUser): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
-}
-
-function clearSavedUser(): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.removeItem(AUTH_USER_KEY);
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Check token validity on mount
   useEffect(() => {
     const token = getAuthToken();
-    const savedUser = getSavedUser();
+    const saved = getSavedUser();
+    const expiresAt = getAuthExpiry();
 
-    if (token && savedUser) {
-      setUser(savedUser);
+    if (token && saved && expiresAt) {
+      if (new Date(expiresAt) <= new Date()) {
+        clearAuthData();
+      } else {
+        setUser(saved);
+      }
     }
 
     setIsLoading(false);
   }, []);
 
+  // Listen for session expired events from api-client (401 responses)
+  useEffect(() => {
+    const handleExpired = (): void => {
+      setUser(null);
+    };
+    window.addEventListener("auth:expired", handleExpired);
+    return () => window.removeEventListener("auth:expired", handleExpired);
+  }, []);
+
+  // Redirect based on auth state
   useEffect(() => {
     if (isLoading) return;
 
@@ -82,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     saveUser(authUser);
+    setAuthExpiry(response.expiraEn);
     setUser(authUser);
   }, []);
 
@@ -90,10 +91,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await authApi.logout();
     } catch {
       // Even if logout API fails, clear local state
-      clearAuthToken();
     }
 
-    clearSavedUser();
+    clearAuthData();
     setUser(null);
     router.replace("/login");
   }, [router]);
