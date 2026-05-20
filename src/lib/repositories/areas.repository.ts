@@ -1,6 +1,7 @@
-import { mockDb } from "@/lib/mock/database";
+import { areasApi } from "@/lib/api";
 import type { Area } from "@/types/area";
 
 export async function listAreas(): Promise<Area[]> {
-  return mockDb.getAreas().sort((a, b) => a.nombreArea.localeCompare(b.nombreArea));
+  const areas = await areasApi.list();
+  return areas.sort((a, b) => a.nombreArea.localeCompare(b.nombreArea));
 }

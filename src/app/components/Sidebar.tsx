@@ -3,9 +3,11 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   const navItems = [
     {
@@ -37,6 +39,10 @@ export default function Sidebar() {
       )
     }
   ];
+
+  async function handleLogout() {
+    await logout();
+  }
 
   return (
     <aside className="w-[260px] bg-[#2b4592] text-white flex flex-col flex-shrink-0 h-full">
@@ -80,7 +86,23 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-4 py-6 mb-5">
-        <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-[#d1dbfa] text-[0.95rem] font-medium transition-colors hover:bg-white/5 hover:text-white w-full text-left cursor-pointer">
+        {/* User info */}
+        {user && (
+          <div className="flex items-center gap-3 px-4 py-3 mb-3 rounded-lg bg-white/5">
+            <div className="w-8 h-8 rounded-full bg-[#4318ff] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+              {user.nombreCompleto.split(" ").map((n) => n[0]?.toUpperCase()).join("").slice(0, 2)}
+            </div>
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-sm font-medium text-white truncate">{user.nombreCompleto}</span>
+              <span className="text-[0.7rem] text-[#aebce5] capitalize">{user.rol}</span>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-4 py-3 rounded-lg text-[#d1dbfa] text-[0.95rem] font-medium transition-colors hover:bg-white/5 hover:text-white w-full text-left cursor-pointer"
+        >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
           Cerrar Sesión
         </button>

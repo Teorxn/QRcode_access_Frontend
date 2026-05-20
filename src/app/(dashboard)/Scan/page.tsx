@@ -7,7 +7,7 @@ import {
   validateAccess,
 } from "@/lib/repositories";
 import type { ScanValidationResult } from "@/types/scan";
-import QrScanner from "../components/QrScanner";
+import QrScanner from "@/app/components/QrScanner";
 
 export default function Scan() {
   const [qrInput, setQrInput] = useState("");
@@ -271,10 +271,9 @@ export default function Scan() {
                   <div className="text-xs text-[#475569] mt-1">
                     {lastResult.mensaje}
                   </div>
-                  {lastResult.empleado && (
+                  {lastResult.empleadoNombre && (
                     <div className="text-xs text-[#475569] mt-1">
-                      Empleado: {lastResult.empleado.nombres}{" "}
-                      {lastResult.empleado.apellidos}
+                      Empleado: {lastResult.empleadoNombre}
                     </div>
                   )}
                 </div>

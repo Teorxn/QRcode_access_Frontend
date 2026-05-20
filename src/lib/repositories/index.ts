@@ -7,3 +7,4 @@ export {
   getRecentAccesses,
 } from "@/lib/repositories/dashboard.repository";
 export { getDemoQrCodes, validateAccess } from "@/lib/repositories/scan.repository";
+export { exportAccessPdf, exportAccessExcel } from "@/lib/repositories/reports.repository";

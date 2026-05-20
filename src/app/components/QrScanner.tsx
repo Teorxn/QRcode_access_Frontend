@@ -18,36 +18,13 @@ export default function QrScanner({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
-  const [cameras, setCameras] = useState<{ id: string; label: string }[]>([]);
-  const [selectedCamera, setSelectedCamera] = useState<string>("");
 
-  // Fetch available cameras on mount
+  // Start / stop scanner with auto camera detection
   useEffect(() => {
-    Html5Qrcode.getCameras()
-      .then((devices) => {
-        if (devices && devices.length > 0) {
-          const mapped = devices.map((d) => ({ id: d.id, label: d.label }));
-          setCameras(mapped);
-          // Default to last camera (usually rear on mobile)
-          setSelectedCamera(mapped[mapped.length - 1].id);
-        } else {
-          setCameraError("No se encontraron cámaras disponibles.");
-        }
-      })
-      .catch(() => {
-        setCameraError(
-          "No se pudo acceder a la cámara. Verifique los permisos del navegador.",
-        );
-      });
-  }, []);
-
-  // Start / stop scanner when camera is selected or paused changes
-  useEffect(() => {
-    if (!selectedCamera || !containerRef.current) return;
+    if (!containerRef.current) return;
 
     const elementId = "qr-scanner-region";
 
-    // Create scanner instance if needed
     if (!scannerRef.current) {
       scannerRef.current = new Html5Qrcode(elementId);
     }
@@ -56,109 +33,70 @@ export default function QrScanner({
 
     if (paused) {
       if (isRunning) {
-        scanner
-          .stop()
-          .then(() => setIsRunning(false))
-          .catch(() => {});
+        try {
+          scanner.stop();
+          setIsRunning(false);
+        } catch {
+          // scanner already stopped or not running
+        }
       }
       return;
     }
 
-    // Start scanning
-    if (!isRunning) {
-      scanner
-        .start(
-          selectedCamera,
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-          },
-          (decodedText) => {
-            onScanSuccess(decodedText);
-          },
-          (errorMessage) => {
-            onScanError?.(errorMessage);
-          },
-        )
-        .then(() => {
-          setIsRunning(true);
-          setCameraError(null);
-        })
-        .catch((err: Error) => {
+    async function startScanner(): Promise<void> {
+      try {
+        await scanner.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          (decodedText) => { onScanSuccess(decodedText); },
+          (errorMessage) => { onScanError?.(errorMessage); },
+        );
+        setIsRunning(true);
+        setCameraError(null);
+      } catch {
+        // Fallback: enumerate cameras and try the first available
+        try {
+          const devices = await Html5Qrcode.getCameras();
+          if (devices && devices.length > 0) {
+            await scanner.start(
+              devices[0].id,
+              { fps: 10, qrbox: { width: 250, height: 250 } },
+              (decodedText) => { onScanSuccess(decodedText); },
+              (errorMessage) => { onScanError?.(errorMessage); },
+            );
+            setIsRunning(true);
+            setCameraError(null);
+          } else {
+            setCameraError("No se encontraron cámaras disponibles.");
+          }
+        } catch (fallbackErr) {
           setCameraError(
-            `Error al iniciar la cámara: ${err.message || "desconocido"}`,
+            `Error al iniciar la cámara: ${(fallbackErr as Error).message || "desconocido"}`,
           );
-        });
+        }
+      }
     }
 
-    // Cleanup on unmount
+    if (!isRunning) {
+      startScanner();
+    }
+
     return () => {
       if (scannerRef.current) {
-        scannerRef.current
-          .stop()
-          .then(() => {
-            scannerRef.current?.clear();
-            scannerRef.current = null;
-            setIsRunning(false);
-          })
-          .catch(() => {
-            scannerRef.current = null;
-          });
+        try {
+          scanner.stop();
+        } catch {
+          // scanner already stopped or not running
+        }
+        scannerRef.current = null;
+        setIsRunning(false);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCamera, paused]);
+  }, [paused]);
 
   return (
     <div className="w-full flex flex-col items-center gap-4">
-      {/* Camera selector */}
-      {cameras.length > 1 && (
-        <div className="w-full max-w-xl flex items-center gap-3">
-          <label className="text-sm font-medium text-[#8f9bba] whitespace-nowrap">
-            Cámara:
-          </label>
-          <div className="relative flex-1">
-            <select
-              value={selectedCamera}
-              onChange={(e) => {
-                // Stop current before switching
-                if (scannerRef.current && isRunning) {
-                  scannerRef.current
-                    .stop()
-                    .then(() => {
-                      setIsRunning(false);
-                      setSelectedCamera(e.target.value);
-                    })
-                    .catch(() => {});
-                } else {
-                  setSelectedCamera(e.target.value);
-                }
-              }}
-              className="w-full appearance-none pl-4 pr-10 py-2 rounded-lg border border-[#e2e8f0] focus:outline-none focus:border-[#4318ff] focus:ring-1 focus:ring-[#4318ff] text-sm text-[#1b254b] bg-white"
-            >
-              {cameras.map((cam) => (
-                <option key={cam.id} value={cam.id}>
-                  {cam.label || `Cámara ${cam.id.slice(0, 8)}`}
-                </option>
-              ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-[#a3aed0]">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Scanner viewport */}
       <div
@@ -181,7 +119,7 @@ export default function QrScanner({
         {/* html5-qrcode renders the video here */}
         <div
           id="qr-scanner-region"
-          className="w-full h-full [&>video]:object-cover [&>video]:w-full [&>video]:h-full"
+          className="w-full h-full [&>video]:object-cover [&>video]:w-full [&>video]:h-full [&>video]:scale-x-[-1]"
         ></div>
 
         {/* Error or loading overlay */}

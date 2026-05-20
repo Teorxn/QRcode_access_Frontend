@@ -1,4 +1,5 @@
 import { ApiError } from "@/lib/http/api-error";
+import { clearAuthData, getAuthToken } from "@/lib/http/auth-token";
 
 type QueryValue = string | number | boolean | null | undefined;
 type QueryParams = Record<string, QueryValue>;
@@ -54,6 +55,11 @@ async function request<T>(path: string, config: RequestConfig = {}): Promise<T> 
     requestHeaders.set("Content-Type", "application/json");
   }
 
+  const token = getAuthToken();
+  if (token && !requestHeaders.has("Authorization")) {
+    requestHeaders.set("Authorization", `Bearer ${token}`);
+  }
+
   const response = await fetch(createUrl(path, query), {
     ...rest,
     headers: requestHeaders,
@@ -64,6 +70,13 @@ async function request<T>(path: string, config: RequestConfig = {}): Promise<T> 
           ? (body as BodyInit)
           : JSON.stringify(body),
   });
+
+  if (response.status === 401 && !path.includes("/auth/")) {
+    clearAuthData();
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("auth:expired"));
+    }
+  }
 
   const data = await parseResponseBody(response);
 
@@ -90,4 +103,29 @@ export const apiClient = {
     request<T>(path, { ...config, method: "PATCH", body }),
   delete: <T>(path: string, config?: Omit<RequestConfig, "body">) =>
     request<T>(path, { ...config, method: "DELETE" }),
+  download: async (path: string, config: Omit<RequestConfig, "body"> = {}): Promise<Blob> => {
+    const { query, headers, ...rest } = config;
+
+    const requestHeaders = new Headers(headers);
+    const token = getAuthToken();
+    if (token && !requestHeaders.has("Authorization")) {
+      requestHeaders.set("Authorization", `Bearer ${token}`);
+    }
+
+    const response = await fetch(createUrl(path, query), {
+      ...rest,
+      headers: requestHeaders,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new ApiError(
+        `Download failed with status ${response.status}`,
+        response.status,
+        text,
+      );
+    }
+
+    return response.blob();
+  },
 };

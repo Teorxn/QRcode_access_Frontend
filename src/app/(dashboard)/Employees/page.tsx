@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { listAreas, listEmployees } from "@/lib/repositories";
+import { qrApi } from "@/lib/api";
+import QrDisplay from "@/app/components/QrDisplay";
 import type { Area } from "@/types/area";
 import type { EmployeeListItem } from "@/lib/repositories/employees.repository";
 
@@ -13,6 +15,20 @@ export default function Employees() {
   const [selectedStatus, setSelectedStatus] = useState<
     "all" | "active" | "inactive"
   >("all");
+  const [qrData, setQrData] = useState<{ hash: string; name: string } | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
+
+  const handleGenerateQr = useCallback(async (idEmpleado: number, fullName: string) => {
+    setQrLoading(true);
+    try {
+      const result = await qrApi.generateForEmployee(idEmpleado);
+      setQrData({ hash: result.codigoHash, name: fullName });
+    } catch {
+      alert("Error al generar el código QR");
+    } finally {
+      setQrLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     async function loadAreas(): Promise<void> {
@@ -248,31 +264,39 @@ export default function Employees() {
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-3">
                       <button
-                        className="text-[#4318ff] hover:text-[#3412cb] transition-colors"
+                        className="text-[#4318ff] hover:text-[#3412cb] transition-colors disabled:opacity-40"
                         title="Ver QR"
+                        disabled={qrLoading}
+                        onClick={() => handleGenerateQr(row.employee.idEmpleado, row.fullName)}
                       >
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
-                          <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
-                          <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
-                          <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
-                          <rect
-                            x="7"
-                            y="7"
-                            width="10"
-                            height="10"
-                            rx="1"
-                          ></rect>
-                        </svg>
+                        {qrLoading ? (
+                          <svg className="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                          </svg>
+                        ) : (
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                            <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                            <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                            <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                            <rect
+                              x="7"
+                              y="7"
+                              width="10"
+                              height="10"
+                              rx="1"
+                            ></rect>
+                          </svg>
+                        )}
                       </button>
                       <button
                         className="text-[#8f9bba] hover:text-[#1b254b] transition-colors"
@@ -329,6 +353,14 @@ export default function Employees() {
           </table>
         </div>
       </div>
+
+      {qrData && (
+        <QrDisplay
+          hash={qrData.hash}
+          employeeName={qrData.name}
+          onClose={() => setQrData(null)}
+        />
+      )}
     </>
   );
 }
