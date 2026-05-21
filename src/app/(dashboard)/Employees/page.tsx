@@ -4,7 +4,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { listAreas, listEmployees } from "@/lib/repositories";
 import { qrApi } from "@/lib/api";
 import QrDisplay from "@/app/components/QrDisplay";
+import EmployeeFormModal from "@/app/components/EmployeeFormModal";
 import type { Area } from "@/types/area";
+import type { Employee } from "@/types/employee";
 import type { EmployeeListItem } from "@/lib/repositories/employees.repository";
 
 export default function Employees() {
@@ -17,6 +19,10 @@ export default function Employees() {
   >("all");
   const [qrData, setQrData] = useState<{ hash: string; name: string } | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [formKey, setFormKey] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleGenerateQr = useCallback(async (idEmpleado: number, fullName: string) => {
     setQrLoading(true);
@@ -56,12 +62,28 @@ export default function Employees() {
     }
 
     void loadEmployees();
-  }, [search, selectedArea, selectedStatus]);
+  }, [search, selectedArea, selectedStatus, refreshKey]);
 
   const totalActivos = useMemo(
     () => rows.filter((row) => row.employee.activo).length,
     [rows],
   );
+
+  const handleFormSuccess = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
+
+  const handleAdd = useCallback(() => {
+    setEditingEmployee(null);
+    setFormKey((k) => k + 1);
+    setFormOpen(true);
+  }, []);
+
+  const handleEdit = useCallback((employee: Employee) => {
+    setEditingEmployee(employee);
+    setFormKey((k) => k + 1);
+    setFormOpen(true);
+  }, []);
 
   const getInitials = (fullName: string): string => {
     const parts = fullName.split(" ").filter(Boolean).slice(0, 2);
@@ -183,7 +205,10 @@ export default function Employees() {
             </svg>
             Exportar
           </button>
-          <button className="flex items-center gap-2 bg-[#1d3ebd] hover:bg-[#183196] text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm">
+          <button
+            onClick={handleAdd}
+            className="flex items-center gap-2 bg-[#1d3ebd] hover:bg-[#183196] text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+          >
             <svg
               width="18"
               height="18"
@@ -301,6 +326,7 @@ export default function Employees() {
                       <button
                         className="text-[#8f9bba] hover:text-[#1b254b] transition-colors"
                         title="Editar"
+                        onClick={() => handleEdit(row.employee)}
                       >
                         <svg
                           width="20"
@@ -361,6 +387,15 @@ export default function Employees() {
           onClose={() => setQrData(null)}
         />
       )}
+
+      <EmployeeFormModal
+        key={formKey}
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        onSuccess={handleFormSuccess}
+        employee={editingEmployee}
+        areas={areas}
+      />
     </>
   );
 }
